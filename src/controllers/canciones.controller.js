@@ -1,7 +1,7 @@
 const { request, response } = require('express')
 const cancionesController = {};
 const db = require("../database/models");
-
+const { validationResult } = require("express-validator");
 
 cancionesController.getAll = async(req = request, res = response) => {
     try {
@@ -54,6 +54,16 @@ cancionesController.getById = async(req = request, res = response) => {
 }
 cancionesController.create = async(req = request, res = response) => {
     try {
+
+        let errores = validationResult(req);
+        if (!errores.isEmpty()) {
+            res.status(400).json({
+                response: false,
+                errors: errores.mapped(),
+            });
+            return;
+        }
+
         const data = {
             titulo: req.body.titulo,
             duracion: Number(req.body.duracion),
